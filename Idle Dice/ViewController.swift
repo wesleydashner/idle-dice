@@ -10,29 +10,41 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    let dice = [UIImageView(image: UIImage(named: "one")), UIImageView(image: UIImage(named: "two")), UIImageView(image: UIImage(named: "three")), UIImageView(image: UIImage(named: "four")), UIImageView(image: UIImage(named: "five")), UIImageView(image: UIImage(named: "six"))]
+    var dice: [Die] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setup()
+    }
+    
+    func setup() {
+        populateDice()
         setupUI()
         setupGestures()
     }
     
+    func populateDice() {
+        let numOfDice = 6
+        for _ in 0..<numOfDice {
+            dice.append(Die())
+        }
+    }
+    
     private func setupUI() {
         positionView(parentView: view, subView: UIImageView(image: UIImage(named: "background")!), xRatio: 0.5, yRatio: 0.5, widthRatio: 1, heightRatio: 1)
-        positionSquareView(parentView: view, subView: dice[0], xRatio: 1/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[1], xRatio: 3/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[2], xRatio: 1/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[3], xRatio: 3/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[4], xRatio: 1/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[5], xRatio: 3/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[0].imageView, xRatio: 1/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[1].imageView, xRatio: 3/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[2].imageView, xRatio: 1/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[3].imageView, xRatio: 3/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[4].imageView, xRatio: 1/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[5].imageView, xRatio: 3/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
     }
     
     private func setupGestures() {
         for die in dice {
             let viewGesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped))
-            die.isUserInteractionEnabled = true
-            die.addGestureRecognizer(viewGesture)
+            die.imageView.isUserInteractionEnabled = true
+            die.imageView.addGestureRecognizer(viewGesture)
         }
     }
     
@@ -68,7 +80,7 @@ class ViewController: UIViewController {
     
     private func roll() {
         for die in dice {
-            die.image = UIImage(named: getRandomNumString())
+            die.imageView.image = UIImage(named: getRandomNumString())
         }
     }
 

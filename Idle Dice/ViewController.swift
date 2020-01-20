@@ -65,7 +65,9 @@ class ViewController: UIViewController {
     }
     
     private func loadPlayerObject() {
-        player = Storage.retrieve("player.json", from: .documents, as: Player.self)
+        if Storage.fileExists("player.json", in: .documents) {
+            player = Storage.retrieve("player.json", from: .documents, as: Player.self)
+        }
     }
     
     private func addView(parentView: UIView, subView: UIView, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {

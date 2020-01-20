@@ -11,6 +11,8 @@ import UIKit
 class ViewController: UIViewController {
     
     var dice: [Die] = []
+    let background = UIImageView(image: UIImage(named: "background"))
+    let moneyLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +23,7 @@ class ViewController: UIViewController {
         populateDice()
         setupUI()
         setupGestures()
+        roll()
     }
     
     func populateDice() {
@@ -31,20 +34,32 @@ class ViewController: UIViewController {
     }
     
     private func setupUI() {
-        positionView(parentView: view, subView: UIImageView(image: UIImage(named: "background")!), xRatio: 0.5, yRatio: 0.5, widthRatio: 1, heightRatio: 1)
-        positionSquareView(parentView: view, subView: dice[0].imageView, xRatio: 1/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[1].imageView, xRatio: 3/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[2].imageView, xRatio: 1/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[3].imageView, xRatio: 3/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[4].imageView, xRatio: 1/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
-        positionSquareView(parentView: view, subView: dice[5].imageView, xRatio: 3/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
+        positionView(parentView: view, subView: background, xRatio: 0.5, yRatio: 0.5, widthRatio: 1, heightRatio: 1)
+        positionSquareView(parentView: view, subView: dice[0].view, xRatio: 1/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[1].view, xRatio: 3/4, yRatio: 1/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[2].view, xRatio: 1/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[3].view, xRatio: 3/4, yRatio: 2/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[4].view, xRatio: 1/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
+        positionSquareView(parentView: view, subView: dice[5].view, xRatio: 3/4, yRatio: 3/4, sizeRatioToWidth: 1/3)
+        
+        positionView(parentView: view, subView: moneyLabel, xRatio: 0.5, yRatio: 0.1, widthRatio: 1, heightRatio: 0.1)
+        moneyLabel.textAlignment = .center
+        updateMoneyLabel()
+    }
+    
+    private func updateMoneyLabel() {
+        moneyLabel.text = "$ \(player.money)"
     }
     
     private func setupGestures() {
-        for die in dice {
-            let viewGesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped))
-            die.imageView.isUserInteractionEnabled = true
-            die.imageView.addGestureRecognizer(viewGesture)
+        let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(self.backgroundTapped))
+        background.isUserInteractionEnabled = true
+        background.addGestureRecognizer(backgroundGesture)
+        for i in 0..<dice.count {
+            let dieGesture = DieTapGesture(target: self, action: #selector(self.dieTapped))
+            dieGesture.dieIndex = i
+            dice[i].view.isUserInteractionEnabled = true
+            dice[i].view.addGestureRecognizer(dieGesture)
         }
     }
     
@@ -79,13 +94,47 @@ class ViewController: UIViewController {
     }
     
     private func roll() {
-        for die in dice {
-            die.imageView.image = UIImage(named: getRandomNumString())
+        var values: [Int] = []
+        for i in 0..<dice.count {
+            dice[i].roll(sixPercentChance: player.sixPercentChances[i])
+            values.append(dice[i].value)
+        }
+    }
+    
+    private func doWin() {
+        player.money += dice[0].value
+        updateMoneyLabel()
+        stopKeepingDice()
+        roll()
+    }
+    
+    private func stopKeepingDice() {
+        for i in 0..<dice.count {
+            dice[i].setKeep(doKeep: false)
         }
     }
 
-    @objc func viewTapped() {
+    @objc func backgroundTapped() {
         roll()
+    }
+    
+    @objc func dieTapped(sender: DieTapGesture) {
+        dice[sender.dieIndex].toggleKeep()
+        if isWin() {
+            doWin()
+        }
+    }
+    
+    private func isWin() -> Bool {
+        for die in dice {
+            if die.doKeep == false {
+                return false
+            }
+            if die.value != dice[0].value {
+                return false
+            }
+        }
+        return true
     }
 
 }

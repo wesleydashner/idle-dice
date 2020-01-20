@@ -10,10 +10,7 @@ import Foundation
 
 var player = Player()
 
-class Player: Codable {
-    var money: Int
-    
-    init() {
-        money = 0
-    }
+struct Player: Codable {
+    var money = 0
+    var sixPercentChances = [17, 17, 17, 17, 17, 17]
 }

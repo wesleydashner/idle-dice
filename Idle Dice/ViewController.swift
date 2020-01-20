@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     }
     
     func setup() {
+        loadPlayerObject()
         populateDice()
         setupUI()
         setupGestures()
@@ -61,6 +62,10 @@ class ViewController: UIViewController {
             dice[i].view.isUserInteractionEnabled = true
             dice[i].view.addGestureRecognizer(dieGesture)
         }
+    }
+    
+    private func loadPlayerObject() {
+        player = Storage.retrieve("player.json", from: .documents, as: Player.self)
     }
     
     private func addView(parentView: UIView, subView: UIView, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {

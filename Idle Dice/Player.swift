@@ -11,6 +11,14 @@ import Foundation
 var player = Player()
 
 struct Player: Codable {
-    var money = 0
-    var sixPercentChances = [17, 17, 17, 17, 17, 17]
+    var money = 0 {
+        didSet {
+            Storage.store(self, to: .documents, as: "player.json")
+        }
+    }
+    var sixPercentChances = [17, 17, 17, 17, 17, 17] {
+        didSet {
+            Storage.store(self, to: .documents, as: "player.json")
+        }
+    }
 }
